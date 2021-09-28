@@ -1,94 +1,95 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useLayoutEffect } from "react";
 import { View, Text, Button } from "react-native";
 import { globalStyles } from "./styles/global";
 import { Bubble, GiftedChat, Send } from "react-native-gifted-chat";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { auth, db } from "./database/firebase";
+import { Avatar } from "react-native-elements";
+import globalUserModel from "./Model";
+import { TouchableOpacity } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 
-export default function ChatScreen({ route }) {
-  const [message, setMessages] = useState({});
+export default function ChatScreen({route, navigation }) {
+  const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-      {
-        _id: 2,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-    ]);
+  useLayoutEffect(() => {
+    const unsubscribe = db
+      .collection("/messages")
+      .orderBy("createdAt", "desc")
+      .onSnapshot((snapshot) =>
+        setMessages(
+          snapshot.docs.map((doc) => ({
+            id: doc.data().id,
+            createAt: doc.data().createAt,
+            text: doc.data().text,
+            user: doc.data().user,
+          }))
+        )
+      );
+    return unsubscribe;
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: route.params.userName,
+      headerLeft: () => {
+        <View style={{ marginLeft: 30 }}>
+          <Avatar
+            rounded
+            source={{
+              uri: globalUserModel.photo,
+            }}
+          />
+        </View>;
+      },
+      headerRight: () => {
+        <TouchableOpacity
+          style={{
+            marginRight: 30,
+          }}
+          onPress={signOut}
+        >
+          <AntDesign name="logout" size={24} color="#2e64e5" />
+        </TouchableOpacity>;
+      },
+    });
+  });
+
+  const signOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        navigation.replace("LoginScreen");
+      })
+      .catch((error) => {
+        const errormessage = error.message;
+        alert(errormessage);
+      });
+  };
 
   const onSend = useCallback((messages = []) => {
-    setTimeout(
-      () =>
-        setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, messages)
-        ),
-      0
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, messages)
     );
+    const { id, createAt, text, user } = messages[0];
+    db.collection("messages").doc("messages").add({
+      id,
+      createAt,
+      text,
+      user,
+    });
   }, []);
-
-  const renderBubble = (props) => {
-    <Bubble
-      {...props}
-      wrapperStyle={{
-        right: {
-          backgroundColor: "#2e64e5",
-        },
-      }}
-      textStyle={{
-        right: {
-          color: "#fff",
-        },
-      }}
-    />;
-  };
-
-  const renderSend = (props) => {
-    return (
-      <Send {...props}>
-        <View>
-          <MaterialIcons
-            name="send"
-            size={24}
-            color="#2e64e5"
-            style={{ marginBottom: 10, marginRight: 10 }}
-          />
-        </View>
-      </Send>
-    );
-  };
-
-  const scrollToBottomComponent = (props) => {
-    return <FontAwesome name="angle-double-down" size={24} color="#333" />;
-  };
 
   return (
     <GiftedChat
-      messages={message}
+      messages={messages}
       onSend={(messages) => onSend(messages)}
       user={{
-        _id: 1,
+        id: auth?.currentUser?.email,
+        name: auth?.currentUser?.displayName,
+        avatar: auth?.currentUser?.photoURL,
       }}
-      renderBubble={renderBubble}
-      alwaysShowSend
-      renderSend={renderSend}
-      scrollToBottom
-      scrollToBottomComponent={scrollToBottomComponent}
+      showAvatarForEveryMessage={true}
     />
   );
 }

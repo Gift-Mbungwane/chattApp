@@ -1,6 +1,6 @@
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-import firebase from "firebase/app";
+import firebase from "firebase";
 import "firebase/auth";
 import "firebase/firestore";
 
@@ -18,6 +18,6 @@ const app = firebase.initializeApp(firebaseApp);
 
 const db = app.firestore();
 
-const auth = firebase.auth(app);
+const auth = firebase.auth();
 
 export { db, auth };

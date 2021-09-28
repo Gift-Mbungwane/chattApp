@@ -11,12 +11,14 @@ import globalUserModel from "./Model";
 import { Input, Button } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons, AntDesign, Feather } from "@expo/vector-icons";
-import { auth } from "./database/firebase";
+import { auth, db } from "./database/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const image = require("../assets/Signin.jpg");
 
 export default function SignupScreen({ navigation }) {
+  
+
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
@@ -37,7 +39,7 @@ export default function SignupScreen({ navigation }) {
       quality: 1,
     });
 
-    console.log(result);
+    console.log(result.uri);
 
     if (!result.cancelled) {
       globalUserModel.setPhoto(result.uri);
@@ -51,18 +53,17 @@ export default function SignupScreen({ navigation }) {
         globalUserModel.email,
         globalUserModel.password
       )
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        updateProfile(user, {
-          displayName: globalUserModel.userName,
-          email: globalUserModel.email,
-          photoURL: globalUserModel.photo
-            ? globalUserModel.photo
-            : "https://www.google.com/url?sa=i&url=https%3A%2F%2Ffindicons.com%2Fsearch%2Favatar&psig=AOvVaw1sEiZj4FJSN9RhgnlAWSrl&ust=1632779417317000&source=images&cd=vfe&ved=0CAkQjRxqFwoTCKDOlcbPnfMCFQAAAAAdAAAAABAD",
-        });
-        // ...
-      })
+           .then(userCredential => {
+​
+                const user = userCredential.user;
+                
+                return db.collection("users").doc(user.uid).set({
+                    uid: user.uid,
+                    name: name,
+                    email: user.email,
+                });
+            // ...
+        })
       .catch((error) => {
         const errorMessage = error.message;
         alert(errorMessage);

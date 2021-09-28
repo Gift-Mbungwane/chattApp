@@ -1,49 +1,50 @@
 import React, { useEffect } from "react";
-import {
-  ImageBackground,
-  TextInput,
-  View,
-  KeyboardAvoidingView,
-  ScrollView,
-} from "react-native";
+import { View, KeyboardAvoidingView, ScrollView } from "react-native";
 import { globalStyles } from "./styles/global";
 import globalUserModel from "./Model";
 import { Input, Button } from "react-native-elements";
 import { MaterialIcons } from "@expo/vector-icons";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "./database/firebase";
+import { auth } from "./database/firebase";
 
 const image = require("../assets/Signin.jpg");
 
 export default function LoginScreen({ navigation }) {
+  
   const login = () => {
     auth
       .signInWithEmailAndPassword(
         globalUserModel.email,
         globalUserModel.password
-      )
+      ).then((userCredential)=> {
+        const user = userCredential.user;
+                navigation.replace("ChatlistScreen");
+
+      })
       .catch((error) => {
         const errorMessage = error.message;
         alert(errorMessage);
       });
-  };
 
+      
+  };
+/*
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
         //const uid = user.uid;
-        navigation.navigate("ChatScreen");
+        navigation.replace("ChatlistScreen");
         // ...
       } else {
         // User is signed out
         // ...
+        navigation.canGoBack() && navigation.popToTop();
       }
     });
     return unsubscribe;
   }, []);
-
+*/
   return (
     <View
       style={{
