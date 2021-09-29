@@ -11,14 +11,13 @@ import globalUserModel from "./Model";
 import { Input, Button } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons, AntDesign, Feather } from "@expo/vector-icons";
-import { auth, db } from "./database/firebase";
+import { auth, db, firebaseApp, userCollection } from "./database/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const image = require("../assets/Signin.jpg");
+const fb = require("../components/database/firebase.js");
 
 export default function SignupScreen({ navigation }) {
-  
-
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
@@ -53,28 +52,56 @@ export default function SignupScreen({ navigation }) {
         globalUserModel.email,
         globalUserModel.password
       )
-           .then(userCredential => {
-​
-                const user = userCredential.user;
-                
-                return db.collection("users").doc(user.uid).set({
-                    uid: user.uid,
-                    name: name,
-                    email: user.email,
-                });
-            // ...
-        })
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        user.updateProfile({
+          userName: globalUserModel.userName,
+          email: globalUserModel.email,
+          photoURL: globalUserModel.photo
+            ? globalUserModel.photo
+            : "https://www.google.com/url?sa=i&url=https%3A%2F%2Ffindicons.com%2Fsearch%2Favatar&psig=AOvVaw1sEiZj4FJSN9RhgnlAWSrl&ust=1632779417317000&source=images&cd=vfe&ved=0CAkQjRxqFwoTCKDOlcbPnfMCFQAAAAAdAAAAABAD",
+        });
+
+        return db.collection("users").doc(user.uid).set({
+          uid: user.uid,
+          userName: globalUserModel.userName,
+          email: user.email,
+          photoURL: globalUserModel.photo,
+        });
+        // ...
+      })
       .catch((error) => {
         const errorMessage = error.message;
         alert(errorMessage);
       });
   };
+  useEffect(() => {
+    async () => {
+      if (register) {
+        const userId = userCredential.user.id;
+        const userData = {
+          userName: globalUserModel.userName,
+          email: globalUserModel.email,
+          photoURL: globalUserModel.photo,
+          uid: userCredential.user.id,
+        };
+        fb.userCollection
+          .doc(userId)
+          .set(userData)
+          .then(() => {
+            console.log("user has been successfully added to database");
+          });
+      }
+    };
+  }, []);
 
   return (
     <View
       style={{
         padding: 24,
         marginTop: 10,
+        ImageBackground: require("../assets/Home.jpg"),
       }}
       scrollToBottom
     >

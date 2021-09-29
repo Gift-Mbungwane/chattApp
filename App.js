@@ -57,25 +57,14 @@ export default function App() {
       <Stack.Navigator headerMode="none">
         {globalUserModel.users ? (
           <>
-            <>
-              {(props) => (
-                <ChatlistScreen {...props} user={globalUserModel.users} component={ChatlistScreen} />
-              )}
-            </>
-            <Stack.Screen
-              name="ChatScreen"
-              options={({ route }) => ({ title: route.params.userName })}
-            >
-              {(props) => (
-                <ChatScreen {...props} user={globalUserModel.users} component={ChatScreen} />
-              )}
-            </Stack.Screen>
+            <Stack.Screen name="ChatlistScreen" component={ChatlistScreen} />
+            <Stack.Screen name="ChatScreen" component={ChatScreen} />
           </>
         ) : (
           <>
             <Stack.Screen name="LoginScreen" component={LoginScreen} />
             <Stack.Screen name="SignupScreen" component={SignupScreen} />
-            <Stack.Screen name="ChatlistScreen" component={ChatlistScreen}/>
+            <Stack.Screen name="ChatlistScreen" component={ChatlistScreen} />
           </>
         )}
       </Stack.Navigator>

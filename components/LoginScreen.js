@@ -9,7 +9,7 @@ import { auth } from "./database/firebase";
 const image = require("../assets/Signin.jpg");
 
 export default function LoginScreen({ navigation }) {
-  
+
   const login = () => {
     auth
       .signInWithEmailAndPassword(
@@ -17,7 +17,6 @@ export default function LoginScreen({ navigation }) {
         globalUserModel.password
       ).then((userCredential)=> {
         const user = userCredential.user;
-                navigation.replace("ChatlistScreen");
 
       })
       .catch((error) => {
@@ -51,11 +50,11 @@ export default function LoginScreen({ navigation }) {
         padding: 24,
         marginTop: 100,
       }}
-    >
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <KeyboardAvoidingView
+    ><KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
+      <ScrollView showsVerticalScrollIndicator={false}>
+        
           <Input
             multiline
             placeholder="email@address.com"
@@ -85,8 +84,8 @@ export default function LoginScreen({ navigation }) {
               }}
             />
           </View>
-        </KeyboardAvoidingView>
       </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }

@@ -5,22 +5,21 @@ import { db } from "./database/firebase";
 import globalUserModel from "./Model";
 import { globalStyles } from "./styles/global";
 
-export default function ChatlistScreen({ users, navigation }) {
-    
-    const getUser = async () => {
-        try {
-            const querySnap = await db
-                .collection("users")
-                .where("uid", "!=", globalUserModel.uid)
-                .get();
-            const Users = querySnap.docs.map((docSnap) => docSnap.data());
+export default function ChatlistScreen({ user, navigation }) {
+  const getUser = async () => {
+    try {
+      const querySnap = await db
+        .collection("users")
+        .where("uid", "!=", globalUserModel.uid)
+        .get();
+      const Users = querySnap.docs.map((docSnap) => docSnap.data());
 
-            globalUserModel.setUsers(Users);
-        } catch (rror) {
-            const errormessage = rror.message;
-            alert(rror);
-        }
+      globalUserModel.setUsers(Users);
+    } catch (rror) {
+      const errormessage = rror.message;
+      alert(rror);
     }
+  };
 
   useEffect(() => {
     getUser();
@@ -44,11 +43,8 @@ export default function ChatlistScreen({ users, navigation }) {
               </View>
               <View style={globalStyles.textSection}>
                 <View style={globalStyles.userInfoText}>
-                  <View style={globalStyles.userName}>
-                  </View>
-                 
+                  <View style={globalStyles.userName}></View>
                 </View>
-                
               </View>
             </View>
           </TouchableOpacity>
