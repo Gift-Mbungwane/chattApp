@@ -9,24 +9,22 @@ import { auth } from "./database/firebase";
 const image = require("../assets/Signin.jpg");
 
 export default function LoginScreen({ navigation }) {
-
   const login = () => {
     auth
       .signInWithEmailAndPassword(
         globalUserModel.email,
         globalUserModel.password
-      ).then((userCredential)=> {
+      )
+      .then((userCredential) => {
         const user = userCredential.user;
-
       })
+      .then(() => navigation.navigate("ChatlistScreen"))
       .catch((error) => {
         const errorMessage = error.message;
         alert(errorMessage);
       });
-
-      
   };
-/*
+  /*
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -50,11 +48,11 @@ export default function LoginScreen({ navigation }) {
         padding: 24,
         marginTop: 100,
       }}
-    ><KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-      <ScrollView showsVerticalScrollIndicator={false}>
-        
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView showsVerticalScrollIndicator={false}>
           <Input
             multiline
             placeholder="email@address.com"
@@ -84,7 +82,7 @@ export default function LoginScreen({ navigation }) {
               }}
             />
           </View>
-      </ScrollView>
+        </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );

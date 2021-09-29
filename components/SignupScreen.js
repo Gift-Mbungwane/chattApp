@@ -55,13 +55,15 @@ export default function SignupScreen({ navigation }) {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        user.updateProfile({
-          userName: globalUserModel.userName,
-          email: globalUserModel.email,
-          photoURL: globalUserModel.photo
-            ? globalUserModel.photo
-            : "https://www.google.com/url?sa=i&url=https%3A%2F%2Ffindicons.com%2Fsearch%2Favatar&psig=AOvVaw1sEiZj4FJSN9RhgnlAWSrl&ust=1632779417317000&source=images&cd=vfe&ved=0CAkQjRxqFwoTCKDOlcbPnfMCFQAAAAAdAAAAABAD",
-        });
+        user
+          .updateProfile({
+            userName: globalUserModel.userName,
+            email: globalUserModel.email,
+            photoURL: globalUserModel.photo
+              ? globalUserModel.photo
+              : "https://www.google.com/url?sa=i&url=https%3A%2F%2Ffindicons.com%2Fsearch%2Favatar&psig=AOvVaw1sEiZj4FJSN9RhgnlAWSrl&ust=1632779417317000&source=images&cd=vfe&ved=0CAkQjRxqFwoTCKDOlcbPnfMCFQAAAAAdAAAAABAD",
+          })
+          .then(() => navigation.navigate("ChatlistScreen"));
 
         return db.collection("users").doc(user.uid).set({
           uid: user.uid,

@@ -1,15 +1,16 @@
 import React, { useEffect, useLayoutEffect } from "react";
 import { View, Text, Image } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
-import { db } from "./database/firebase";
+import { db, userCollection } from "./database/firebase";
 import globalUserModel from "./Model";
 import { globalStyles } from "./styles/global";
+
+const fb = require("../components/database/firebase.js");
 
 export default function ChatlistScreen({ user, navigation }) {
   const getUser = async () => {
     try {
-      const querySnap = await db
-        .collection("users")
+      const querySnap = await fb.userCollection
         .where("uid", "!=", globalUserModel.uid)
         .get();
       const Users = querySnap.docs.map((docSnap) => docSnap.data());
@@ -17,12 +18,14 @@ export default function ChatlistScreen({ user, navigation }) {
       globalUserModel.setUsers(Users);
     } catch (rror) {
       const errormessage = rror.message;
-      alert(rror);
+      alert(errormessage);
     }
   };
 
   useEffect(() => {
-    getUser();
+    async () => {
+      getUser();
+    };
   }, []);
 
   return (
@@ -34,7 +37,7 @@ export default function ChatlistScreen({ user, navigation }) {
           <TouchableOpacity
             style={globalStyles.card}
             onPress={navigation.navigate("ChatScreen", {
-              userName: users.params.userName,
+              userName: user.params.userName,
             })}
           >
             <View style={globalStyles.userInfo}>
