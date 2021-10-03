@@ -7,40 +7,29 @@ import ChatScreen from "./components/ChatScreen";
 import { auth } from "./components/database/firebase";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import globalUserModel from "./components/Model";
-import { View } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
-import ChatlistScreen from "./components/ChatlistScreen";
+import { Alert, View } from "react-native";
+import { AntDesign, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import DashboardScreen from "./components/DashboardScreen";
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  const myOptions = {
-    headerShown: false,
-
-    headerRight: () => {
-      <TouchableOpacity
-        style={{
-          marginRight: 30,
-        }}
-        onPress={() =>
-          auth
-            .signOut()
-            .then(() => {
-              navigation.replace("LoginScreen");
-            })
-            .catch((error) => {
-              const errormessage = error.message;
-              alert(errormessage);
-            })
-        }
-      >
-        <AntDesign name="logout" size={24} color="#2e64e5" />
-      </TouchableOpacity>;
-    },
+export default function App({ navigation }) {
+  const logOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        alert("You have been sign out successfully");
+        navigation.navigate("LoginScreen");
+      })
+      .catch((error) => {
+        const errorM = error.message;
+        alert(errorM);
+      });
   };
 
   useEffect(() => {
-    const deregister = auth.onAuthStateChanged((exist) => {
+    // logOut();
+    /* const deregister = auth.onAuthStateChanged((exist) => {
       if (exist) {
         globalUserModel.setUsers(exist);
       } else {
@@ -49,24 +38,59 @@ export default function App() {
     });
     return () => {
       deregister();
-    };
+    }; */
   }, []);
 
   return (
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
-        {globalUserModel.users ? (
-          <>
-            <Stack.Screen name="ChatlistScreen" component={ChatlistScreen} />
-            <Stack.Screen name="ChatScreen" component={ChatScreen} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="LoginScreen" component={LoginScreen} />
-            <Stack.Screen name="SignupScreen" component={SignupScreen} />
-            <Stack.Screen name="ChatlistScreen" component={ChatlistScreen} />
-          </>
-        )}
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen name="SignupScreen" component={SignupScreen} />
+        <Stack.Screen
+          name="DashboardScreen"
+          component={DashboardScreen}
+          options={{
+            title: "",
+            headerRight: () => (
+              <TouchableOpacity onPress={() => logOut()}>
+                <MaterialIcons
+                  name="logout"
+                  size={24}
+                  color="#2e64e5"
+                  style={{
+                    alignItems: "flex-start",
+                    alignSelf: "flex-start",
+                    right: 0,
+                  }}
+                />
+              </TouchableOpacity>
+            ),
+          }}
+        />
+
+        <Stack.Screen
+          name="ChatScreen"
+          component={ChatScreen}
+          options={{
+            title: "ChatScreen",
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ChatScreen")}
+              >
+                <Ionicons
+                  name="chevron-back"
+                  size={24}
+                  color="#2e64e5"
+                  style={{
+                    alignItems: "flex-end",
+                    alignSelf: "flex-end",
+                    right: 0,
+                  }}
+                />
+              </TouchableOpacity>
+            ),
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

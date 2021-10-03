@@ -11,7 +11,14 @@ import globalUserModel from "./Model";
 import { Input, Button } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons, AntDesign, Feather } from "@expo/vector-icons";
-import { auth, db, firebaseApp, userCollection } from "./database/firebase";
+import {
+  auth,
+  db,
+  firebaseApp,
+  userCollection,
+  realtimedb,
+  storage,
+} from "./database/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const image = require("../assets/Signin.jpg");
@@ -42,7 +49,6 @@ export default function SignupScreen({ navigation }) {
 
     if (!result.cancelled) {
       globalUserModel.setPhoto(result.uri);
-      // setImage(result.uri);
     }
   };
 
@@ -63,21 +69,38 @@ export default function SignupScreen({ navigation }) {
               ? globalUserModel.photo
               : "https://www.google.com/url?sa=i&url=https%3A%2F%2Ffindicons.com%2Fsearch%2Favatar&psig=AOvVaw1sEiZj4FJSN9RhgnlAWSrl&ust=1632779417317000&source=images&cd=vfe&ved=0CAkQjRxqFwoTCKDOlcbPnfMCFQAAAAAdAAAAABAD",
           })
-          .then(() => navigation.navigate("ChatlistScreen"));
-
-        return db.collection("users").doc(user.uid).set({
-          uid: user.uid,
-          userName: globalUserModel.userName,
-          email: user.email,
-          photoURL: globalUserModel.photo,
-        });
-        // ...
+          .then(() => {
+            return db.collection("users").doc(user.uid).set({
+              uid: user.uid,
+              userName: globalUserModel.userName,
+              email: user.email,
+              photoURL: globalUserModel.photo,
+            });
+            // ...
+          })
+          .then(() => {
+            return realtimedb.ref("/users" + user.uid).set({
+              userName: globalUserModel.userName,
+              email: globalUserModel.email,
+              photo: globalUserModel.photo,
+              uuid: user.uid,
+            });
+          })
+          .then(() => {
+            // return storage.ref("images/" + user.uid).put
+          })
+          .catch((error) => {
+            errorMeassage = error.message;
+            alert(errorMeassage);
+          });
+        navigation.popToTop();
       })
       .catch((error) => {
         const errorMessage = error.message;
         alert(errorMessage);
       });
   };
+
   useEffect(() => {
     async () => {
       if (register) {
@@ -93,6 +116,18 @@ export default function SignupScreen({ navigation }) {
           .set(userData)
           .then(() => {
             console.log("user has been successfully added to database");
+          });
+        realtimedb
+          .ref("/users" + userId)
+          .set(userData)
+          .then(() => {
+            console.log("successfully added to real time db");
+          });
+        storage
+          .ref("/images" + userId)
+          .getDownloadURL(userData.photoURL)
+          .then(() => {
+            console.log("image loaded successfully");
           });
       }
     };

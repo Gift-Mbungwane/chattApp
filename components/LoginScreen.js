@@ -10,33 +10,28 @@ const image = require("../assets/Signin.jpg");
 
 export default function LoginScreen({ navigation }) {
   const login = () => {
+    //try {
     auth
       .signInWithEmailAndPassword(
         globalUserModel.email,
         globalUserModel.password
       )
-      .then((userCredential) => {
-        const user = userCredential.user;
+      .then(() => {
+        navigation.replace("DashboardScreen");
       })
-      .then(() => navigation.navigate("ChatlistScreen"))
       .catch((error) => {
-        const errorMessage = error.message;
-        alert(errorMessage);
+        erroMessage = error.message;
+        alert(erroMessage);
       });
   };
   /*
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        //const uid = user.uid;
-        navigation.replace("ChatlistScreen");
-        // ...
+        navigation.navigate("ChatScreen");
       } else {
-        // User is signed out
-        // ...
         navigation.canGoBack() && navigation.popToTop();
+        //No User is Sign-In
       }
     });
     return unsubscribe;

@@ -7,7 +7,8 @@ class Model {
   photo;
   password;
   users;
-  messages;
+  messages = [];
+  allUsers = null;
 
   constructor() {}
 
@@ -42,6 +43,9 @@ class Model {
   }
   setMessages(messages) {
     this.messages = messages;
+  }
+  setAllUsers(allusers = null) {
+    this.allUsers = allusers;
   }
 }
 
