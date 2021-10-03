@@ -45,14 +45,16 @@ export default function DashboardScreen({ navigation }) {
           justifyContent: "center",
           alignItems: "center",
         }}
-        data={allUsers}
+        data={user}
         showsVerticalScrollIndicator={false}
       >
         <Image
           style={{ height: 150, width: 150, borderRadius: 75 }}
           source={{ uri: auth?.currentUser?.photoURL }}
         />
-        <Text>{auth?.currentUser?.email}</Text>
+        <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+          {auth?.currentUser?.email}
+        </Text>
         <FlatList
           data={allUsers}
           renderItem={({ item }) => {
@@ -86,6 +88,7 @@ export default function DashboardScreen({ navigation }) {
                       padding: 24,
                       fontSize: 20,
                       marginHorizontal: 100,
+                      fontWeight: "bold",
                     }}
                   >
                     {item.userName}

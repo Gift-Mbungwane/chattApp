@@ -60,6 +60,7 @@ export default function SignupScreen({ navigation }) {
       )
       .then((userCredential) => {
         // Signed in
+        alert("You have been successfully registered");
         const user = userCredential.user;
         user
           .updateProfile({

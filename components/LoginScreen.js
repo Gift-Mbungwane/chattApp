@@ -17,6 +17,7 @@ export default function LoginScreen({ navigation }) {
         globalUserModel.password
       )
       .then(() => {
+        alert("Logging in...");
         navigation.replace("DashboardScreen");
       })
       .catch((error) => {
