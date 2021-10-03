@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, realtimedb, db } from "./database/firebase";
 import globalUserModel from "./Model";
 
-export default function DashboardScreen({ navigation }) {
+export default function DashboardScreen({ props, navigation }) {
   const [allUsers, setAllUsers] = useState(null);
   const [user, SetUser] = useState(null);
 
@@ -59,7 +59,10 @@ export default function DashboardScreen({ navigation }) {
           data={allUsers}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity item={item}>
+              <TouchableOpacity
+                item={item}
+                onPress={() => navigation.navigate("ChatScreen", item.userName)}
+              >
                 <View
                   style={{
                     marginTop: 20,
